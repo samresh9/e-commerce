@@ -11,14 +11,20 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
+  @Column({ unique: true, nullable: false })
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   password: string;
 
-  @Column()
-  userName: string;
+  @Column({ nullable: false })
+  firstname: string;
+
+  @Column({ nullable: false })
+  lastname: string;
+
+  @Column({ nullable: false })
+  phoneNumber: number;
 
   @CreateDateColumn()
   createdAt: Date;
