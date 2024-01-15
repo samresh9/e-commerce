@@ -6,7 +6,7 @@ import { User } from 'src/entity/user.entity';
 
 @Module({
   // imports:[UserRepository]
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User])], // This import makes User entity and its repository available in this module.
   controllers: [UsersController],
   providers: [UsersService],
 })
