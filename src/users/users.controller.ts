@@ -30,7 +30,6 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: 'Create New User' })
   async createUser(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
     return {
       statusCode: HttpStatus.CREATED,
       message: 'User Created',

@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entity/user.entity';
+import { User } from './users/entity/user.entity';
+import { ProductsModule } from './products/products.module';
+import { Product } from './products/entity/product.entity';
 
 @Module({
   imports: [
@@ -12,10 +14,11 @@ import { User } from './entity/user.entity';
       username: 'postgres',
       password: 'Samresh7@',
       database: 'e-com',
-      entities: [User],
+      entities: [User, Product],
       synchronize: true,
     }),
     UsersModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [],
