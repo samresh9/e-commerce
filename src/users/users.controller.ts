@@ -39,7 +39,6 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') id: string) {
-    console.log(typeof id);
     return {
       statusCode: HttpStatus.OK,
       message: 'Success',
