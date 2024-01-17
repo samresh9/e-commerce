@@ -39,7 +39,7 @@ export class ProductsService {
           name: true,
         },
       },
-      where: { productId: id },
+      where: { id: id },
       relations: ['category'],
     });
     if (!product) {
@@ -64,7 +64,7 @@ export class ProductsService {
   //update the product details
   async update(updateProductDto: any, id: number) {
     const product = await this.productRepository.findOneBy({
-      productId: id,
+      id: id,
     });
 
     if (!product) throw new NotFoundException('Product Not Found');

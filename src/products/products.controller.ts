@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   Delete,
+  HttpStatus,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -17,17 +18,29 @@ export class ProductsController {
 
   @Post()
   async createProduct(@Body() createProductDto: CreateProductDto) {
-    return await this.productService.create(createProductDto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User Created',
+      data: await this.productService.create(createProductDto),
+    };
   }
 
   @Get()
   async getAllProduct() {
-    return await this.productService.findAll();
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User Created',
+      data: await this.productService.findAll(),
+    };
   }
 
   @Get(':id')
   async getProductById(@Param('id') id: string) {
-    return await this.productService.findOne(parseInt(id));
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User Created',
+      data: await this.productService.findOne(parseInt(id)),
+    };
   }
 
   @Put(':id')
@@ -35,11 +48,19 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
     @Param('id') id: string,
   ) {
-    return await this.productService.update(updateProductDto, parseInt(id));
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User Created',
+      data: await this.productService.update(updateProductDto, parseInt(id)),
+    };
   }
 
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
-    return await this.productService.removeProduct(parseInt(id));
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User Created',
+      data: await this.productService.removeProduct(parseInt(id)),
+    };
   }
 }
