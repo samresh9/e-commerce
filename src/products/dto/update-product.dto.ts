@@ -21,5 +21,5 @@ export class UpdateProductDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
-  customerId?: number;
+  categoryId?: number;
 }
