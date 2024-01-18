@@ -22,7 +22,9 @@ export class Product {
   @Column({ type: 'decimal', precision: 10, scale: 3 })
   price: number;
 
-  @ManyToOne(() => Category, (category) => category.products)
+  @ManyToOne(() => Category, (category) => category.products, {
+    onDelete: 'SET NULL',
+  })
   category: Category;
 
   @CreateDateColumn({ type: 'timestamp' })

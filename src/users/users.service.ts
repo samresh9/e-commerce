@@ -22,7 +22,7 @@ export class UsersService {
         email,
       },
     });
-    console.log(existingUser);
+
     if (existingUser) {
       throw new BadRequestException('Email Already Exists');
     }
