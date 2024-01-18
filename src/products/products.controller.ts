@@ -20,7 +20,7 @@ export class ProductsController {
   async createProduct(@Body() createProductDto: CreateProductDto) {
     return {
       statusCode: HttpStatus.CREATED,
-      message: 'User Created',
+      message: 'Product Created',
       data: await this.productService.create(createProductDto),
     };
   }
@@ -29,7 +29,7 @@ export class ProductsController {
   async getAllProduct() {
     return {
       statusCode: HttpStatus.CREATED,
-      message: 'User Created',
+      message: 'Success',
       data: await this.productService.findAll(),
     };
   }
@@ -37,8 +37,8 @@ export class ProductsController {
   @Get(':id')
   async getProductById(@Param('id') id: string) {
     return {
-      statusCode: HttpStatus.CREATED,
-      message: 'User Created',
+      statusCode: HttpStatus.OK,
+      message: 'Success',
       data: await this.productService.findOne(parseInt(id)),
     };
   }
@@ -49,8 +49,8 @@ export class ProductsController {
     @Param('id') id: string,
   ) {
     return {
-      statusCode: HttpStatus.CREATED,
-      message: 'User Created',
+      statusCode: HttpStatus.OK,
+      message: 'Product Updated',
       data: await this.productService.update(updateProductDto, parseInt(id)),
     };
   }
@@ -58,8 +58,8 @@ export class ProductsController {
   @Delete(':id')
   async deleteProduct(@Param('id') id: string) {
     return {
-      statusCode: HttpStatus.CREATED,
-      message: 'User Created',
+      statusCode: HttpStatus.OK,
+      message: 'Product Deleted',
       data: await this.productService.removeProduct(parseInt(id)),
     };
   }
