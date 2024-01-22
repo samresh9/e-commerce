@@ -6,6 +6,7 @@ import { ProductsModule } from './products/products.module';
 import { Product } from './products/entity/product.entity';
 import { CategoriesModule } from './categories/categories.module';
 import { Category } from './categories/entity/category.entity';
+import { ProductImage } from './products/entity/product-image.entity';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { Category } from './categories/entity/category.entity';
       username: 'postgres',
       password: 'Samresh7@',
       database: 'e-com',
-      entities: [User, Product, Category],
+      entities: [User, Product, Category, ProductImage],
       synchronize: true,
     }),
     UsersModule,

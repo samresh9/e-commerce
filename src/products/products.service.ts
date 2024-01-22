@@ -5,11 +5,14 @@ import { Repository } from 'typeorm';
 import { Category } from 'src/categories/entity/category.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductImage } from './entity/product-image.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
+    @InjectRepository(ProductImage)
+    private productImageRepository: Repository<ProductImage>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
   ) {}
@@ -28,6 +31,15 @@ export class ProductsService {
       price: createProductDto.price,
       category,
     });
+    //if images are given
+    if (createProductDto.images) {
+      const productImgs = createProductDto.images.map(({ url, title }) =>
+        this.productImageRepository.create({ url, title }),
+      );
+      const productImages = await this.productImageRepository.save(productImgs);
+      product.productImages = productImages;
+    }
+
     return this.productRepository.save(product);
   }
 
@@ -49,7 +61,7 @@ export class ProductsService {
     return product;
   }
 
-  //finds all product with category detail
+  //finds all product with category detail and images
   async findAll() {
     return this.productRepository.find({
       select: {
@@ -58,7 +70,7 @@ export class ProductsService {
           name: true,
         },
       },
-      relations: ['category'],
+      relations: ['category', 'productImages'],
     });
   }
 
@@ -86,4 +98,7 @@ export class ProductsService {
     const product = await this.findOne(id);
     return this.productRepository.remove(product);
   }
+
+  //find images of the product
+  // async findImages
 }

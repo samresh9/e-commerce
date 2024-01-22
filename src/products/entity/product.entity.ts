@@ -6,7 +6,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
+import { ProductImage } from './product-image.entity';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -26,6 +28,9 @@ export class Product {
     onDelete: 'SET NULL',
   })
   category: Category;
+
+  @OneToMany(() => ProductImage, (productImage) => productImage.product)
+  productImages: ProductImage[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
