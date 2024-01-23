@@ -33,8 +33,8 @@ export class ProductsService {
     });
     //if images are given
     if (createProductDto.images) {
-      const productImgs = createProductDto.images.map(({ url, title }) =>
-        this.productImageRepository.create({ url, title }),
+      const productImgs = createProductDto.images.map((url) =>
+        this.productImageRepository.create({ url }),
       );
       const productImages = await this.productImageRepository.save(productImgs);
       product.productImages = productImages;
@@ -76,8 +76,9 @@ export class ProductsService {
 
   //update the product details
   async update(updateProductDto: UpdateProductDto, id: number) {
-    const product = await this.productRepository.findOneBy({
-      id: id,
+    const product = await this.productRepository.findOne({
+      where: { id: id },
+      relations: ['productImages'],
     });
 
     if (!product) throw new NotFoundException('Product Not Found');
@@ -90,6 +91,15 @@ export class ProductsService {
 
       product.category = category;
     }
+    //Update images
+    if (updateProductDto.images) {
+      const productImgs = updateProductDto.images.map((url) =>
+        this.productImageRepository.create({ url }),
+      );
+      const newProductImages =
+        await this.productImageRepository.save(productImgs);
+      product.productImages = [...product.productImages, ...newProductImages];
+    }
     return this.productRepository.save({ ...product, ...updateProductDto });
   }
 
@@ -100,5 +110,14 @@ export class ProductsService {
   }
 
   //find images of the product
-  // async findImages
+  async findImages(id: number) {
+    const images = await this.productRepository.findOne({
+      select: {
+        id: true,
+      },
+      where: { id },
+      relations: ['productImages'],
+    });
+    return images;
+  }
 }

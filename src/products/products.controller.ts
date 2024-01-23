@@ -8,49 +8,44 @@ import {
   Delete,
   HttpStatus,
   UseInterceptors,
-  UploadedFile,
-  ValidationPipe,
+  UploadedFiles,
   ParseIntPipe,
-  UsePipes,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags, ApiConsumes, ApiOperation, ApiBody } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { TestDto } from './dto/test.dto';
-import { ToNumberPipe } from './parse-int.pipe';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { ImageValidationPipe } from './pipe/image-validation.pipe';
 
 @Controller('products')
 @ApiTags('Products')
 export class ProductsController {
-  constructor(private readonly productService: ProductsService) {}
+  constructor(
+    private readonly productService: ProductsService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @Post()
-  async createProduct(@Body() createProductDto: CreateProductDto) {
+  @ApiOperation({ summary: 'Create New Product With Images' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: CreateProductDto,
+  })
+  @UseInterceptors(FilesInterceptor('files'))
+  async createProduct(
+    @UploadedFiles(new ImageValidationPipe())
+    files: Express.Multer.File[],
+    @Body() createProductDto: CreateProductDto,
+  ) {
+    const images = await Promise.all(this.cloudinaryService.uploadFile(files));
+    createProductDto.images = images;
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Product Created',
       data: await this.productService.create(createProductDto),
     };
-  }
-
-  // route for testing the file uploads
-  @Post('upload')
-  @ApiOperation({ summary: 'Upload a file with additional form data' })
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('files'))
-  @UsePipes(ToNumberPipe)
-  async upload(
-    // @Body('number', ParseIntPipe) number: number,
-    @UploadedFile() files: Express.Multer.File,
-    @Body() formdata: TestDto,
-  ) {
-    formdata.files = files;
-    console.log(formdata, 'fromdata');
-    console.log(files);
-    console.log(typeof formdata);
-    return formdata;
   }
 
   @Get()
@@ -63,19 +58,28 @@ export class ProductsController {
   }
 
   @Get(':id')
-  async getProductById(@Param('id') id: string) {
+  async getProductById(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: HttpStatus.OK,
       message: 'Success',
-      data: await this.productService.findOne(parseInt(id)),
+      data: await this.productService.findOne(id),
     };
   }
 
   @Put(':id')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: UpdateProductDto,
+  })
+  @UseInterceptors(FilesInterceptor('files'))
   async update(
+    @UploadedFiles(new ImageValidationPipe())
+    files: Express.Multer.File[],
     @Body() updateProductDto: UpdateProductDto,
     @Param('id') id: string,
   ) {
+    const images = await Promise.all(this.cloudinaryService.uploadFile(files));
+    updateProductDto.images = images;
     return {
       statusCode: HttpStatus.OK,
       message: 'Product Updated',
@@ -84,13 +88,20 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  async deleteProduct(@Param('id') id: string) {
+  async deleteProduct(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: HttpStatus.OK,
       message: 'Product Deleted',
-      data: await this.productService.removeProduct(parseInt(id)),
+      data: await this.productService.removeProduct(id),
     };
   }
 
-  // @Post("/")
+  @Get(':id/images')
+  async getImagesByProduct(@Param('id', ParseIntPipe) id: number) {
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      data: await this.productService.findImages(id),
+    };
+  }
 }
