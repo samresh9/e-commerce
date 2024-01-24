@@ -4,10 +4,10 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from 'src/dto/create-user.dto';
-import { User } from 'src/entity/user.entity';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
-import { UpdateUserDto } from 'src/dto/update-user-dto';
+import { UpdateUserDto } from './dtos/update-user-dto';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +22,7 @@ export class UsersService {
         email,
       },
     });
-    console.log(existingUser);
+
     if (existingUser) {
       throw new BadRequestException('Email Already Exists');
     }

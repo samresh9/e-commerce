@@ -9,9 +9,9 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from 'src/dto/create-user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { UpdateUserDto } from 'src/dto/update-user-dto';
+import { UpdateUserDto } from './dtos/update-user-dto';
 @Controller('users')
 @ApiTags('User')
 export class UsersController {
@@ -30,7 +30,6 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: 'Create New User' })
   async createUser(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
     return {
       statusCode: HttpStatus.CREATED,
       message: 'User Created',
@@ -40,7 +39,6 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') id: string) {
-    console.log(typeof id);
     return {
       statusCode: HttpStatus.OK,
       message: 'Success',

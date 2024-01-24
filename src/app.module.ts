@@ -1,7 +1,13 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entity/user.entity';
+import { User } from './users/entity/user.entity';
+import { ProductsModule } from './products/products.module';
+import { Product } from './products/entity/product.entity';
+import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/entity/category.entity';
+import { ProductImage } from './products/entity/product-image.entity';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -9,13 +15,16 @@ import { User } from './entity/user.entity';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'postgres',
-      password: 'Samresh7@',
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
       database: 'e-com',
-      entities: [User],
+      entities: [User, Product, Category, ProductImage],
       synchronize: true,
     }),
     UsersModule,
+    ProductsModule,
+    CategoriesModule,
+    CloudinaryModule,
   ],
   controllers: [],
   providers: [],
