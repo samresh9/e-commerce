@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entity/product.entity';
 import { Repository } from 'typeorm';
 import { Category } from 'src/categories/entity/category.entity';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from './dtos/create-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductImage } from './entity/product-image.entity';
 
 @Injectable()
@@ -62,16 +66,24 @@ export class ProductsService {
   }
 
   //finds all product with category detail and images
-  async findAll() {
-    return this.productRepository.find({
-      select: {
-        category: {
-          id: true,
-          name: true,
-        },
+  async findAll(page: number, pageSize: number) {
+    const skip = (page - 1) * pageSize; //offset , it skips
+    const [users, totalCount] = await this.productRepository.findAndCount({
+      order: {
+        id: 'ASC',
       },
+      skip,
+      take: pageSize,
       relations: ['category', 'productImages'],
     });
+    const totalPages = Math.ceil(totalCount / pageSize);
+    if (page > totalPages) {
+      throw new BadRequestException(
+        `Invalid page number, should be less than or eqauls to ${totalPages}`,
+      );
+    }
+
+    return [users, totalCount];
   }
 
   //update the product details

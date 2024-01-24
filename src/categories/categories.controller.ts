@@ -10,9 +10,9 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -20,6 +20,7 @@ export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create  A new Category' })
   async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return {
       statusCode: HttpStatus.CREATED,
@@ -29,6 +30,7 @@ export class CategoriesController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Find All Categories' })
   async findAll() {
     return {
       statusCode: HttpStatus.OK,
@@ -38,6 +40,7 @@ export class CategoriesController {
   }
 
   @Get(':id/product')
+  @ApiOperation({ summary: 'Get all products related to the category by Id' })
   async getProductsOfCategory(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: HttpStatus.OK,
@@ -47,6 +50,7 @@ export class CategoriesController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update one Category' })
   async updateOne(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -59,6 +63,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete One Category' })
   async deleteOne(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: HttpStatus.OK,

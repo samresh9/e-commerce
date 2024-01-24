@@ -10,14 +10,16 @@ import {
   UseInterceptors,
   UploadedFiles,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from './dtos/create-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
 import { ApiTags, ApiConsumes, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ImageValidationPipe } from './pipe/image-validation.pipe';
+import { PaginationDto } from './dtos/pagination.dto';
 
 @Controller('products')
 @ApiTags('Products')
@@ -49,15 +51,25 @@ export class ProductsController {
   }
 
   @Get()
-  async getAllProduct() {
+  @ApiOperation({ summary: 'Get ALl products with pagination' })
+  async getAllProduct(@Query() paginationDto: PaginationDto) {
+    const { page, pageSize } = paginationDto;
+    const [users, totalCount] = await this.productService.findAll(
+      page,
+      pageSize,
+    );
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Success',
-      data: await this.productService.findAll(),
+      data: {
+        users,
+        totalCount,
+      },
     };
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a Product By Id' })
   async getProductById(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: HttpStatus.OK,
@@ -67,6 +79,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update any Product' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: UpdateProductDto,
@@ -88,6 +101,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete Product with Id' })
   async deleteProduct(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: HttpStatus.OK,
@@ -97,6 +111,7 @@ export class ProductsController {
   }
 
   @Get(':id/images')
+  @ApiOperation({ summary: 'Get Images of a Product by Id' })
   async getImagesByProduct(@Param('id', ParseIntPipe) id: number) {
     return {
       statusCode: HttpStatus.OK,
