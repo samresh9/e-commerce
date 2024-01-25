@@ -9,11 +9,14 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dtos/update-user-dto';
+import { UserToken } from './entity/user-token.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(UserToken)
+    private usersTokenRepository: Repository<UserToken>,
   ) {}
 
   //Checks if email is unique
@@ -76,5 +79,14 @@ export class UsersService {
   async removeUser(id: number) {
     const user = await this.findOne(id);
     return this.userRepository.remove(user);
+  }
+
+  async saveTokenId(id: number, tokenId: string) {
+    const user = await this.findOne(id);
+    //create a new tokenId
+    const userToken = this.usersTokenRepository.create({ tokenId });
+    await this.usersTokenRepository.save(userToken);
+    user.userToken = userToken;
+    await this.userRepository.save(user);
   }
 }

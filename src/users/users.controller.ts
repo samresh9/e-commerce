@@ -7,11 +7,13 @@ import {
   Put,
   HttpStatus,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UpdateUserDto } from './dtos/update-user-dto';
+import { AuthGuard } from 'src/guards/auth.guard';
 @Controller('users')
 @ApiTags('User')
 export class UsersController {
@@ -37,6 +39,7 @@ export class UsersController {
     };
   }
   @Get(':id')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') id: string) {
     return {

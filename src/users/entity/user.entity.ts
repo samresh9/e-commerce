@@ -4,7 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
+import { UserToken } from './user-token.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -25,6 +28,10 @@ export class User {
 
   @Column({ nullable: false })
   phoneNumber: number;
+
+  @OneToOne(() => UserToken)
+  @JoinColumn()
+  userToken: UserToken;
 
   @CreateDateColumn()
   createdAt: Date;

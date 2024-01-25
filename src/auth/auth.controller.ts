@@ -10,7 +10,8 @@ import {
 import { AuthService } from './auth.service';
 import { SignInDto } from './dtos/sigin-in.dto';
 import { ApiResponse } from '@nestjs/swagger';
-import { AuthGuard } from './guards/auth.guard';
+import { AuthGuard } from '../guards/auth.guard';
+import * as uuid from 'uuid';
 
 @Controller('auth')
 export class AuthController {
@@ -24,11 +25,14 @@ export class AuthController {
     type: SignInDto, // Add a DTO class for the response body
   })
   async signIn(@Body() signInDto: SignInDto) {
+    const { accessToken, refreshToken } =
+      await this.authservice.signIn(signInDto);
     return {
       statusCode: HttpStatus.OK,
       message: 'SignIn Success',
       data: {
-        accessToken: await this.authservice.signIn(signInDto),
+        accessToken,
+        refreshToken,
       },
     };
   }
@@ -37,7 +41,12 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async check() {
     return {
-      message: 'Success',
+      hey: uuid.v4(),
     };
+  }
+
+  @Post('refresh')
+  async refreshAccessToken() {
+    return {};
   }
 }

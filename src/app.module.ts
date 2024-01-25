@@ -9,6 +9,7 @@ import { Category } from './categories/entity/category.entity';
 import { ProductImage } from './products/entity/product-image.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { AuthModule } from './auth/auth.module';
+import { UserToken } from './users/entity/user-token.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: 'e-com',
-      entities: [User, Product, Category, ProductImage],
+      entities: [User, Product, Category, ProductImage, UserToken],
       synchronize: true,
     }),
     UsersModule,
