@@ -8,6 +8,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { Category } from './categories/entity/category.entity';
 import { ProductImage } from './products/entity/product-image.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     ProductsModule,
     CategoriesModule,
     CloudinaryModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
