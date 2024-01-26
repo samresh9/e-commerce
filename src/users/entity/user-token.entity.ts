@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.entity';
 
 @Entity({ name: 'user_tokens' })
 export class UserToken {
@@ -7,4 +14,8 @@ export class UserToken {
 
   @Column()
   tokenId: string;
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 }

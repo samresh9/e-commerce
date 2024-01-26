@@ -29,7 +29,7 @@ export class UsersController {
     };
   }
 
-  @Post()
+  @Post('register')
   @ApiOperation({ summary: 'Create New User' })
   async createUser(@Body() createUserDto: CreateUserDto) {
     return {

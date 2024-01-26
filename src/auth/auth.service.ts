@@ -1,9 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { SignInDto } from './dtos/sigin-in.dto';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import * as uuid from 'uuid';
+import { RefreshTokenDto } from './dtos/refresh-token.dto';
+import { AuthTokens, UserPayload } from './types/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -16,27 +22,63 @@ export class AuthService {
     const { email, password } = signInDto;
     const user = await this.userService.findOneByEmail(email);
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new BadRequestException('Email or Password Incorect ');
-    const payload = {
+    if (!isMatch) throw new BadRequestException('Email or Password Incorrect ');
+    const payload: UserPayload = {
       sub: user.id,
       tokenId: uuid.v4(),
       email: user.email,
     };
-    const { accessToken, refreshToken } =
-      await this.genereateAccessAndRefreshToken(payload);
-    return { accessToken, refreshToken };
+    const tokens = this.genereateAccessAndRefreshToken(payload);
+    return tokens;
   }
 
-  async genereateAccessAndRefreshToken(payload) {
+  async genereateAccessAndRefreshToken(
+    payload: UserPayload,
+  ): Promise<AuthTokens> {
     const { sub, tokenId } = payload;
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '30s' });
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '30m',
+      expiresIn: '60s',
     });
-
     await this.userService.saveTokenId(sub, tokenId);
     return { accessToken, refreshToken };
   }
 
-  async refreshAccessToken() {}
+  async refreshAccessToken(refreshTokenDto: RefreshTokenDto) {
+    const { refreshToken } = refreshTokenDto;
+    const payload: UserPayload | null =
+      await this.verifyRefreshToken(refreshToken);
+
+    // const currentTimeStamp = Date.now();
+    // const timeDifference = expiryTimeStamp - currentTimeStamp;
+    // if (timeDifference <= 0) {
+    //   throw new UnauthorizedException('Invalid or expired refresh token');
+    // }
+    if (!payload)
+      throw new UnauthorizedException('Invalid or Expired Refresh Token');
+
+    const { sub: id, tokenId, email } = payload;
+    const hasValidToken = await this.userService.hasValidToken(id, tokenId);
+    if (hasValidToken) {
+      const newPayload: UserPayload = {
+        sub: payload.sub,
+        tokenId: uuid.v4(),
+        email,
+      };
+      return this.genereateAccessAndRefreshToken(newPayload);
+    }
+    throw new UnauthorizedException('Invalid Refresh Token');
+  }
+
+  async verifyRefreshToken(refreshToken: string) {
+    try {
+      return await this.jwtService.verify(refreshToken);
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        // Handle the expired token error here
+        return null;
+      }
+      throw new UnauthorizedException('Token Verifiction Error');
+    }
+  }
 }

@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,7 +24,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    // here nullish coalescing operator is used to check if authorization value is null or undefined if so it gives empty array
+    // here nullish coalescing operator returns [] when authorization value is null or undefined,
     const [type, token] = request.headers['authorization']?.split(' ') ?? []; // using dot notation for authorization gives ts error
     return type === 'Bearer' ? token : undefined;
   }

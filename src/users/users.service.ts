@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -83,10 +84,36 @@ export class UsersService {
 
   async saveTokenId(id: number, tokenId: string) {
     const user = await this.findOne(id);
-    //create a new tokenId
-    const userToken = this.usersTokenRepository.create({ tokenId });
-    await this.usersTokenRepository.save(userToken);
-    user.userToken = userToken;
-    await this.userRepository.save(user);
+    //Check if user has related tokenId in Db
+    const userToken = await this.usersTokenRepository.findOne({
+      where: { user: { id } },
+    });
+    // update tokenId
+    if (userToken) {
+      const UpdateUserToken = this.usersTokenRepository.create({
+        ...userToken,
+        tokenId,
+        user,
+      });
+      await this.usersTokenRepository.save(UpdateUserToken);
+    } else {
+      //create new userToken
+      const newUserToken = this.usersTokenRepository.create({
+        tokenId,
+        user,
+      });
+      await this.usersTokenRepository.save(newUserToken);
+    }
+  }
+
+  async hasValidToken(id: number, tokenId: any) {
+    const userToken = await this.usersTokenRepository.findOne({
+      where: [{ user: { id } }, { tokenId }],
+    });
+
+    const tokenIdFromDb = userToken?.tokenId;
+    if (!tokenId) throw new UnauthorizedException('no');
+    if (tokenId === tokenIdFromDb) return true;
+    return false;
   }
 }

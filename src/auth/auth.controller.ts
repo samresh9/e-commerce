@@ -9,10 +9,12 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dtos/sigin-in.dto';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
 import * as uuid from 'uuid';
+import { RefreshTokenDto } from './dtos/refresh-token.dto';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private authservice: AuthService) {}
@@ -38,6 +40,7 @@ export class AuthController {
   }
 
   @Get()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async check() {
     return {
@@ -45,8 +48,8 @@ export class AuthController {
     };
   }
 
-  @Post('refresh')
-  async refreshAccessToken() {
-    return {};
+  @Post('refresh-token')
+  async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authservice.refreshAccessToken(refreshTokenDto);
   }
 }
