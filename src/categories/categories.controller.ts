@@ -12,7 +12,10 @@ import {
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/decorators/public.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/role.enum';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -20,6 +23,8 @@ export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
   @Post()
+  @ApiBearerAuth()
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Create  A new Category' })
   async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return {
@@ -30,6 +35,7 @@ export class CategoriesController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Find All Categories' })
   async findAll() {
     return {
@@ -40,6 +46,7 @@ export class CategoriesController {
   }
 
   @Get(':id/product')
+  @Public()
   @ApiOperation({ summary: 'Get all products related to the category by Id' })
   async getProductsOfCategory(@Param('id', ParseIntPipe) id: number) {
     return {
@@ -50,6 +57,8 @@ export class CategoriesController {
   }
 
   @Put(':id')
+  @ApiBearerAuth()
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Update one Category' })
   async updateOne(
     @Param('id', ParseIntPipe) id: number,
@@ -63,6 +72,8 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Delete One Category' })
   async deleteOne(@Param('id', ParseIntPipe) id: number) {
     return {

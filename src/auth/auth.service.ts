@@ -27,6 +27,7 @@ export class AuthService {
       sub: user.id,
       tokenId: uuid.v4(),
       email: user.email,
+      roles: [user.roles],
     };
     const tokens = this.genereateAccessAndRefreshToken(payload);
     return tokens;
@@ -36,9 +37,11 @@ export class AuthService {
     payload: UserPayload,
   ): Promise<AuthTokens> {
     const { sub, tokenId } = payload;
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '30s' });
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: process.env.JWT_ACCESS_EXP,
+    });
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '60s',
+      expiresIn: process.env.JWT_REFRESH_EXP,
     });
     await this.userService.saveTokenId(sub, tokenId);
     return { accessToken, refreshToken };
@@ -57,13 +60,14 @@ export class AuthService {
     if (!payload)
       throw new UnauthorizedException('Invalid or Expired Refresh Token');
 
-    const { sub: id, tokenId, email } = payload;
+    const { sub: id, tokenId, email, roles } = payload;
     const hasValidToken = await this.userService.hasValidToken(id, tokenId);
     if (hasValidToken) {
       const newPayload: UserPayload = {
         sub: payload.sub,
         tokenId: uuid.v4(),
         email,
+        roles,
       };
       return this.genereateAccessAndRefreshToken(newPayload);
     }

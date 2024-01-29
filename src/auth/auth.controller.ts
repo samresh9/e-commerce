@@ -13,6 +13,10 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
 import * as uuid from 'uuid';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/role.enum';
+import { Public } from 'src/decorators/public.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -20,6 +24,7 @@ export class AuthController {
   constructor(private authservice: AuthService) {}
 
   @Post('signin')
+  @Public()
   @HttpCode(HttpStatus.OK) // status code in response object
   @ApiResponse({
     status: HttpStatus.OK,
@@ -41,7 +46,7 @@ export class AuthController {
 
   @Get()
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @Roles([Role.Admin])
   async check() {
     return {
       hey: uuid.v4(),
@@ -49,6 +54,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @Public()
   async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authservice.refreshAccessToken(refreshTokenDto);
   }

@@ -10,6 +10,9 @@ import { ProductImage } from './products/entity/product-image.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { AuthModule } from './auth/auth.module';
 import { UserToken } from './users/entity/user-token.entity';
+import { AuthGuard } from './guards/auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -30,6 +33,15 @@ import { UserToken } from './users/entity/user-token.entity';
     CloudinaryModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD, //global auth
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD, //global auth
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}
