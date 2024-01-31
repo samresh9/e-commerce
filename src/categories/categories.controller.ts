@@ -18,12 +18,12 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
 
 @Controller('categories')
+@ApiBearerAuth()
 @ApiTags('Categories')
 export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
   @Post()
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Create  A new Category' })
   async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
@@ -57,7 +57,6 @@ export class CategoriesController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Update one Category' })
   async updateOne(
@@ -72,7 +71,6 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Delete One Category' })
   async deleteOne(@Param('id', ParseIntPipe) id: number) {

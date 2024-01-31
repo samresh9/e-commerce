@@ -5,21 +5,19 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dtos/sigin-in.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '../guards/auth.guard';
 import * as uuid from 'uuid';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
-import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
 import { Public } from 'src/decorators/public.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
+@ApiBearerAuth()
 export class AuthController {
   constructor(private authservice: AuthService) {}
 
@@ -45,7 +43,6 @@ export class AuthController {
   }
 
   @Get()
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   async check() {
     return {

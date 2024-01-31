@@ -31,6 +31,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
 
 @Controller('products')
+@ApiBearerAuth()
 @ApiTags('Products')
 export class ProductsController {
   constructor(
@@ -89,7 +90,6 @@ export class ProductsController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Update any Product' })
   @ApiConsumes('multipart/form-data')
@@ -113,7 +113,6 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Delete Product with Id' })
   async deleteProduct(@Param('id', ParseIntPipe) id: number) {

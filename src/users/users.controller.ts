@@ -16,12 +16,12 @@ import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
 @Controller('users')
+@ApiBearerAuth()
 @ApiTags('User')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Get All Users' })
   async getAllUsers() {
@@ -43,7 +43,6 @@ export class UsersController {
     };
   }
   @Get(':id')
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') id: string) {
@@ -55,7 +54,6 @@ export class UsersController {
   }
 
   @Put(':id')
-  @ApiBearerAuth()
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Update User Information' })
   async updateUser(
