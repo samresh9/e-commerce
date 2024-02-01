@@ -8,6 +8,11 @@ import { CategoriesModule } from './categories/categories.module';
 import { Category } from './categories/entity/category.entity';
 import { ProductImage } from './products/entity/product-image.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { AuthModule } from './auth/auth.module';
+import { UserToken } from './users/entity/user-token.entity';
+import { AuthGuard } from './guards/auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -18,15 +23,25 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: 'e-com',
-      entities: [User, Product, Category, ProductImage],
+      entities: [User, Product, Category, ProductImage, UserToken],
       synchronize: true,
     }),
+    AuthModule,
     UsersModule,
     ProductsModule,
     CategoriesModule,
     CloudinaryModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD, //global auth
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD, //global auth
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

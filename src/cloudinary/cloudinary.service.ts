@@ -11,7 +11,7 @@ export class CloudinaryService {
         const uploadStream = cloudinary.uploader.upload_stream(
           (error, result) => {
             if (error) return reject(error);
-            resolve(result.url);
+            if (result) resolve(result.url);
           },
         );
         streamifier.createReadStream(file.buffer).pipe(uploadStream);

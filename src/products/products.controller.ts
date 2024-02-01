@@ -15,13 +15,23 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { ApiTags, ApiConsumes, ApiOperation, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiConsumes,
+  ApiOperation,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ImageValidationPipe } from './pipe/image-validation.pipe';
 import { PaginationDto } from './dtos/pagination.dto';
+import { Public } from 'src/decorators/public.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/role.enum';
 
 @Controller('products')
+@ApiBearerAuth()
 @ApiTags('Products')
 export class ProductsController {
   constructor(
@@ -51,6 +61,7 @@ export class ProductsController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Get ALl products with pagination' })
   async getAllProduct(@Query() paginationDto: PaginationDto) {
     const { page, pageSize } = paginationDto;
@@ -79,6 +90,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Update any Product' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -101,6 +113,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Delete Product with Id' })
   async deleteProduct(@Param('id', ParseIntPipe) id: number) {
     return {

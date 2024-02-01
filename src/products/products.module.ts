@@ -10,7 +10,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Product, Category, ProductImage]),
-    CloudinaryModule, //to use other module service we need to import the module not the service
+    CloudinaryModule, //to use other module service we need to import the module and the service should be in exports array of the imported module
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

@@ -26,6 +26,9 @@ export class User {
   @Column({ nullable: false })
   phoneNumber: number;
 
+  @Column({ nullable: true, default: 'customer' })
+  roles: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

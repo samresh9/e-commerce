@@ -10,14 +10,19 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateUserDto } from './dtos/update-user-dto';
+import { Public } from 'src/decorators/public.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/role.enum';
 @Controller('users')
+@ApiBearerAuth()
 @ApiTags('User')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get()
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Get All Users' })
   async getAllUsers() {
     return {
@@ -27,7 +32,8 @@ export class UsersController {
     };
   }
 
-  @Post()
+  @Post('register')
+  @Public()
   @ApiOperation({ summary: 'Create New User' })
   async createUser(@Body() createUserDto: CreateUserDto) {
     return {
@@ -37,6 +43,7 @@ export class UsersController {
     };
   }
   @Get(':id')
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') id: string) {
     return {
@@ -47,6 +54,7 @@ export class UsersController {
   }
 
   @Put(':id')
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Update User Information' })
   async updateUser(
     @Param('id') id: string,
@@ -60,6 +68,8 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @Roles([Role.Admin])
   @ApiOperation({ summary: 'Delete User' })
   async removeUser(@Param('id') id: string) {
     return {
