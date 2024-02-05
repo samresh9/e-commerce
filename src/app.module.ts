@@ -13,6 +13,9 @@ import { UserToken } from './users/entity/user-token.entity';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { CartModule } from './cart/cart.module';
+import { Cart } from './cart/entity/cart.entity';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -23,7 +26,7 @@ import { APP_GUARD } from '@nestjs/core';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: 'e-com',
-      entities: [User, Product, Category, ProductImage, UserToken],
+      entities: [User, Product, Category, ProductImage, UserToken, Cart],
       synchronize: true,
     }),
     AuthModule,
@@ -31,6 +34,8 @@ import { APP_GUARD } from '@nestjs/core';
     ProductsModule,
     CategoriesModule,
     CloudinaryModule,
+    CartModule,
+    OrderModule,
   ],
   controllers: [],
   providers: [

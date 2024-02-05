@@ -33,6 +33,7 @@ export class ProductsService {
       name: createProductDto.name,
       description: createProductDto.description,
       price: createProductDto.price,
+      stock: createProductDto.stock,
       category,
     });
     //if images are given

@@ -20,6 +20,14 @@ export class CreateProductDto {
   price: number;
 
   @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  @Transform(({ value }) => {
+    return Number(value);
+  })
+  stock: number;
+
+  @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
   @Transform(({ value }) => {

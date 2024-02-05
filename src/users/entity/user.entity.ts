@@ -1,9 +1,12 @@
+import { Cart } from 'src/cart/entity/cart.entity';
+import { Role } from 'src/role.enum';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -26,12 +29,15 @@ export class User {
   @Column({ nullable: false })
   phoneNumber: number;
 
-  @Column({ nullable: true, default: 'customer' })
-  roles: string;
+  @Column({ nullable: true, type: 'enum', enum: Role, default: Role.Customer })
+  roles: Role; //setting role to be enum
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Cart, (cart) => cart.user)
+  carts: Cart[];
 }
