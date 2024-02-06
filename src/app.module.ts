@@ -15,7 +15,9 @@ import { RolesGuard } from './guards/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { CartModule } from './cart/cart.module';
 import { Cart } from './cart/entity/cart.entity';
-import { OrderModule } from './order/order.module';
+import { OrdersModule } from './orders/orders.module';
+import { Order } from './orders/entity/order.entity';
+import { OrderItem } from './orders/entity/order-item.entity';
 
 @Module({
   imports: [
@@ -26,7 +28,16 @@ import { OrderModule } from './order/order.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: 'e-com',
-      entities: [User, Product, Category, ProductImage, UserToken, Cart],
+      entities: [
+        User,
+        Product,
+        Category,
+        ProductImage,
+        UserToken,
+        Cart,
+        Order,
+        OrderItem,
+      ],
       synchronize: true,
     }),
     AuthModule,
@@ -35,9 +46,8 @@ import { OrderModule } from './order/order.module';
     CategoriesModule,
     CloudinaryModule,
     CartModule,
-    OrderModule,
+    OrdersModule,
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_GUARD, //global auth

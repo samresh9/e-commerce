@@ -1,4 +1,5 @@
 import { Cart } from 'src/cart/entity/cart.entity';
+import { Order } from 'src/orders/entity/order.entity';
 import { Role } from 'src/role.enum';
 import {
   Entity,
@@ -40,4 +41,10 @@ export class User {
 
   @OneToMany(() => Cart, (cart) => cart.user)
   carts: Cart[];
+
+  @OneToMany(() => Order, (order) => order.updated_by)
+  ordersUpdatedBy: Order[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }

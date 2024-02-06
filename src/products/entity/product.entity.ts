@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { ProductImage } from './product-image.entity';
 import { Cart } from 'src/cart/entity/cart.entity';
+import { OrderItem } from 'src/orders/entity/order-item.entity';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -38,6 +39,9 @@ export class Product {
 
   @OneToMany(() => ProductImage, (productImage) => productImage.product)
   productImages: ProductImage[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems: OrderItem[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
