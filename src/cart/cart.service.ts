@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from './entity/cart.entity';
 import { Repository } from 'typeorm';
 import { ProductsService } from 'src/products/products.service';
 import { CreateCartDto } from './dtos/create-cart.dto';
-import { UserPayload } from 'src/auth/types/auth.types';
 import { User } from 'src/users/entity/user.entity';
+import { DeleteCartDto } from './dtos/delete-cart.dto';
 
 @Injectable()
 export class CartService {
@@ -56,6 +56,7 @@ export class CartService {
     return await this.cartRepository
       .createQueryBuilder('cart')
       .innerJoin('cart.user', 'user')
+      .addSelect(['user.id'])
       .innerJoinAndSelect('cart.product', 'product')
       .where('user.id = :id', { id: userId })
       .getMany();
@@ -67,5 +68,31 @@ export class CartService {
       .leftJoinAndSelect('cart.user', 'user')
       .leftJoinAndSelect('cart.product', 'product')
       .getMany();
+  }
+
+  async delete(userId: number, deleteCartDto: DeleteCartDto) {
+    const deletedCart = await Promise.all(
+      deleteCartDto.products.map(async ({ productId }) => {
+        const cartItem = await this.cartRepository
+          .createQueryBuilder('cart')
+          .where('cart.product.id = :productId', { productId })
+          .andWhere('cart.user.id = :userId', { userId })
+          .getOne();
+        if (!cartItem) {
+          throw new NotFoundException('Cart Not Found');
+        }
+        const deleted = await this.cartRepository
+          .createQueryBuilder()
+          .delete()
+          .from(Cart)
+          .where('id = :id', { id: cartItem.id })
+          // .where('product.id = :productId', { productId })
+          // .andWhere('user.id = :userId', { userId })
+          .execute();
+        return deleted.affected;
+      }),
+    );
+
+    return deletedCart;
   }
 }
