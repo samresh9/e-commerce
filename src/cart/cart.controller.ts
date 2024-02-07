@@ -6,6 +6,8 @@ import {
   Delete,
   HttpStatus,
   Put,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { User } from 'src/decorators/current-user.decorator';
@@ -62,7 +64,19 @@ export class CartController {
     };
   }
 
+  @Get(':userId')
+  @Roles([Role.Admin])
+  @ApiOperation({ summary: 'Get  Carts By UserId' })
+  async getCartByUSerId(@Param('userId', ParseIntPipe) userId: number) {
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      data: await this.cartService.getCartByUserId(userId),
+    };
+  }
+
   @Get('user')
+  @Roles([Role.Customer])
   @ApiOperation({ summary: 'Get All Carts By User' })
   async getCartByUser(@User() userId: number) {
     return {
@@ -71,6 +85,7 @@ export class CartController {
       data: await this.cartService.getCartByUserId(userId),
     };
   }
+
   @Delete()
   @ApiOperation({ summary: 'Delete the Cart' })
   async delete(@User() userId: number, @Body() deleteCartDto: DeleteCartDto) {

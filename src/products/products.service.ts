@@ -10,6 +10,7 @@ import { Category } from 'src/categories/entity/category.entity';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductImage } from './entity/product-image.entity';
+import { OrderItem } from 'src/orders/entity/order-item.entity';
 
 @Injectable()
 export class ProductsService {
@@ -132,5 +133,18 @@ export class ProductsService {
       relations: ['productImages'],
     });
     return images;
+  }
+
+  async stockUpdate(orders: OrderItem[], cancelled?: boolean) {
+    for (const order of orders) {
+      const { quantity, product } = order;
+      const prod = await this.findOne(product.id);
+      if (cancelled) {
+        prod.stock += quantity;
+      } else {
+        prod.stock -= quantity;
+      }
+      await this.productRepository.save(prod);
+    }
   }
 }

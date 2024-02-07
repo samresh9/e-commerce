@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
+import { OrderStatus } from '../enums/order-status.enum';
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -17,8 +18,8 @@ export class Order {
   @CreateDateColumn()
   ordered_at: Date;
 
-  @Column({ default: 'processing' })
-  status: string;
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PROCESSING })
+  status: OrderStatus;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   total_price: number;
