@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import { Logger, ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
@@ -32,6 +32,7 @@ import { SearchModule } from './search/search.module';
     SearchModule,
   ],
   providers: [
+    Logger,
     {
       provide: APP_GUARD, //global auth
       useClass: AuthGuard,

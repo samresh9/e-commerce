@@ -11,6 +11,10 @@ import {
   UploadedFiles,
   ParseIntPipe,
   Query,
+  HttpException,
+  Logger,
+  Inject,
+  LoggerService,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dtos/create-product.dto';
@@ -38,6 +42,7 @@ export class ProductsController {
   constructor(
     private readonly productService: ProductsService,
     private readonly cloudinaryService: CloudinaryService,
+    @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
   @Post()
@@ -92,7 +97,7 @@ export class ProductsController {
       pageSize,
     );
     return {
-      statusCode: HttpStatus.CREATED,
+      statusCode: HttpStatus.OK,
       message: 'Success',
       data: {
         products,
@@ -132,6 +137,13 @@ export class ProductsController {
       message: 'Product Updated',
       data: await this.productService.update(updateProductDto, parseInt(id)),
     };
+  }
+
+  @Public()
+  @Get('test/test')
+  async test() {
+    // return await this.productService.findAll(1, 2);
+    throw new HttpException('err', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @Delete(':id')
