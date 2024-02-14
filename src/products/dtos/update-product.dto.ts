@@ -28,6 +28,14 @@ export class UpdateProductDto {
   @Transform(({ value }) => {
     return Number(value);
   })
+  stock?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => {
+    return Number(value);
+  })
   categoryId?: number;
 
   @ApiProperty({
