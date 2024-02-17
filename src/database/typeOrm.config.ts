@@ -3,15 +3,7 @@ import {
   TypeOrmModuleAsyncOptions,
   TypeOrmModuleOptions,
 } from '@nestjs/typeorm';
-import { Cart } from 'src/cart/entity/cart.entity';
-import { Category } from 'src/categories/entity/category.entity';
-import { OrderItem } from 'src/orders/entity/order-item.entity';
-import { Order } from 'src/orders/entity/order.entity';
-import { ProductImage } from 'src/products/entity/product-image.entity';
-import { Product } from 'src/products/entity/product.entity';
-import { UserToken } from 'src/users/entity/user-token.entity';
-import { User } from 'src/users/entity/user.entity';
-
+import * as path from 'path';
 export default class TypeOrmConfig {
   static getOrmConfig(configService: ConfigService): TypeOrmModuleOptions {
     return {
@@ -20,17 +12,9 @@ export default class TypeOrmConfig {
       port: configService.get('DB_PORT') || 5432,
       username: configService.get('DB_USERNAME'),
       password: configService.get('DB_PASSWORD'),
-      database: configService.get('DB_NAME'),
-      entities: [
-        User,
-        Product,
-        Category,
-        ProductImage,
-        UserToken,
-        Cart,
-        Order,
-        OrderItem,
-      ],
+      database: 'e-com',
+      // entities: [__dirname + '/../**/*.entity.{js,ts}'],
+      entities: [path.join(__dirname, '..', '**', '*.entity.{js,ts}')],
       synchronize: true,
     };
   }
