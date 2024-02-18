@@ -37,6 +37,7 @@ export class AuthService {
     payload: UserPayload,
   ): Promise<AuthTokens> {
     const { sub, tokenId } = payload;
+
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: process.env.JWT_ACCESS_EXP,
     });

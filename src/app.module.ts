@@ -18,9 +18,13 @@ import { Cart } from './cart/entity/cart.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entity/order.entity';
 import { OrderItem } from './orders/entity/order-item.entity';
+import { UserAddressModule } from './user_addresses/user_addresses.module';
+import { UserAddress } from './user_addresses/entity/user_addresses.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -37,9 +41,11 @@ import { OrderItem } from './orders/entity/order-item.entity';
         Cart,
         Order,
         OrderItem,
+        UserAddress,
       ],
       synchronize: true,
     }),
+
     AuthModule,
     UsersModule,
     ProductsModule,
@@ -47,6 +53,7 @@ import { OrderItem } from './orders/entity/order-item.entity';
     CloudinaryModule,
     CartModule,
     OrdersModule,
+    UserAddressModule,
   ],
   providers: [
     {

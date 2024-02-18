@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { OrderStatus } from '../enums/order-status.enum';
+import { UserAddress } from 'src/user_addresses/entity/user_addresses.entity';
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -35,6 +36,9 @@ export class Order {
 
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
+
+  @ManyToOne(() => UserAddress, (UserAddress) => UserAddress.orders)
+  userAddress: UserAddress;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
   orderItems: OrderItem[];
