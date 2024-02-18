@@ -11,6 +11,7 @@ import { Cart } from 'src/cart/entity/cart.entity';
   imports: [TypeOrmModule.forFeature([User, UserToken, Cart])], // This import makes User entity and its repository available in this module.
   controllers: [UsersController],
   providers: [UsersService],
+
   exports: [UsersService],
 })
 export class UsersModule {}
