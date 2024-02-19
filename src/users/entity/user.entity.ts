@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Cart } from 'src/cart/entity/cart.entity';
 import { Order } from 'src/orders/entity/order.entity';
 import { Role } from 'src/role.enum';
@@ -20,6 +21,7 @@ export class User {
   email: string;
 
   @Column({ nullable: false })
+  @Exclude()
   password: string;
 
   @Column({ nullable: false })
