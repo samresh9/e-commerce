@@ -48,6 +48,7 @@ export class UserAddressesService {
     userId: number,
   ) {
     const currentUser = await this.usersService.findOne(userId);
+    await this.validateId(addressId, userId);
     const existingAddress = await this.findOne(addressId);
 
     const existingAddresses = await this.findAddressesByUserId(userId);
@@ -82,7 +83,6 @@ export class UserAddressesService {
     const userAddresses = await this.userAddressesRepository
       .createQueryBuilder('useraddresses')
       .where('useraddresses.user.id = :userId', { userId })
-
       .getMany();
 
     if (!userAddresses) throw new NotFoundException('User Address Not Found');
@@ -103,5 +103,26 @@ export class UserAddressesService {
 
     if (!userAddress) return new NotFoundException('User Addresses Not Found');
     return userAddress;
+  }
+
+  async validateId(id: number, userId: number) {
+    const userAddress = await this.userAddressesRepository
+      .createQueryBuilder('useraddresses')
+      .where('useraddresses.id = :id', { id })
+      .andWhere('useraddresses.user.id =:userId', { userId })
+      .getOne();
+    if (!userAddress) throw new NotFoundException('Not Found Error');
+    return true;
+  }
+
+  async delete(id: number, userId: number) {
+    await this.validateId(id, userId);
+    const deleted = await this.userAddressesRepository
+      .createQueryBuilder()
+      .delete()
+      .from(UserAddress)
+      .where('id=:id', { id })
+      .execute();
+    return { deleteCount: deleted.affected };
   }
 }
