@@ -21,6 +21,7 @@ import {
   ApiOperation,
   ApiBody,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
@@ -63,9 +64,23 @@ export class ProductsController {
   @Get()
   @Public()
   @ApiOperation({ summary: 'Get ALl products with pagination' })
-  async getAllProduct(@Query() paginationDto: PaginationDto) {
+  @ApiQuery({ name: 'search', required: false, type: String })
+  async getAllProduct(
+    @Query() paginationDto: PaginationDto,
+    @Query('search') search?: string,
+  ) {
     const { page, pageSize } = paginationDto;
-    const [users, totalCount] = await this.productService.findAll(
+    if (search) {
+      const res = await this.productService.search(page, pageSize, search);
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Success',
+        data: {
+          res,
+        },
+      };
+    }
+    const [products, totalCount] = await this.productService.findAll(
       page,
       pageSize,
     );
@@ -73,7 +88,7 @@ export class ProductsController {
       statusCode: HttpStatus.CREATED,
       message: 'Success',
       data: {
-        users,
+        products,
         totalCount,
       },
     };

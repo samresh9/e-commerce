@@ -12,7 +12,6 @@ import {
 import { UserAddressesService } from './user_addresses.service';
 import { User } from 'src/decorators/current-user.decorator';
 import { CreateUserAddressesDto } from './dtos/create-user-address.dto';
-import { Public } from 'src/decorators/public.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateUserAddressesDto } from './dtos/update-user-address.dto';
 import { Role } from 'src/role.enum';
