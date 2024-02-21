@@ -12,6 +12,7 @@ import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductImage } from './entity/product-image.entity';
 import { OrderItem } from 'src/orders/entity/order-item.entity';
 import { SearchService } from 'src/search/search.service';
+import { max } from 'class-validator';
 
 @Injectable()
 export class ProductsService {
@@ -162,13 +163,29 @@ export class ProductsService {
     }
   }
 
-  async search(page: number, pageSize: number, text: string) {
+  async search(
+    page: number,
+    pageSize: number,
+    text?: string,
+    minPrice?: number,
+    maxPrice?: number,
+  ) {
     const skip = (page - 1) * pageSize; //offset , it skips
     const { count, results } = await this.searchService.searchProducts(
       skip,
       pageSize,
       text,
+      minPrice,
+      maxPrice,
     );
+
+    if (count === 0) {
+      // Handle the case when no results are found
+      return {
+        count: 0,
+        results: [],
+      };
+    }
     const totalCount = count;
     const totalPages = Math.ceil(totalCount / pageSize);
     if (page > totalPages) {

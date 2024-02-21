@@ -30,6 +30,7 @@ import { PaginationDto } from './dtos/pagination.dto';
 import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
+import { SearchProductDto } from './dtos/search-product.dto';
 
 @Controller('products')
 @ApiBearerAuth()
@@ -67,11 +68,18 @@ export class ProductsController {
   @ApiQuery({ name: 'search', required: false, type: String })
   async getAllProduct(
     @Query() paginationDto: PaginationDto,
-    @Query('search') search?: string,
+    @Query() searchProductDto: SearchProductDto,
   ) {
     const { page, pageSize } = paginationDto;
-    if (search) {
-      const res = await this.productService.search(page, pageSize, search);
+    const { minPrice, maxPrice, search } = searchProductDto;
+    if (search || minPrice || maxPrice) {
+      const res = await this.productService.search(
+        page,
+        pageSize,
+        search,
+        minPrice,
+        maxPrice,
+      );
       return {
         statusCode: HttpStatus.CREATED,
         message: 'Success',
