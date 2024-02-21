@@ -42,7 +42,13 @@ export class SearchService {
     });
   }
 
-  async searchProducts(offset: number, limit: number, text?: string) {
+  async searchProducts(
+    offset: number,
+    limit: number,
+    text: string,
+    minPrice: number,
+    maxPrice: number,
+  ) {
     const res = await this.esService.search({
       index: 'products',
       from: offset,
