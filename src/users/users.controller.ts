@@ -15,6 +15,7 @@ import { UpdateUserDto } from './dtos/update-user-dto';
 import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
+import { User } from 'src/decorators/current-user.decorator';
 @Controller('users')
 @ApiBearerAuth()
 @ApiTags('User')
@@ -53,17 +54,17 @@ export class UsersController {
     };
   }
 
-  @Put(':id')
-  @Roles([Role.Admin])
+  @Put()
+  @Roles([Role.Customer, Role.Admin])
   @ApiOperation({ summary: 'Update User Information' })
   async updateUser(
-    @Param('id') id: string,
+    @User() userId: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'User Updated',
-      data: await this.userService.updateUser(parseInt(id), updateUserDto),
+      data: await this.userService.updateUser(userId, updateUserDto),
     };
   }
 

@@ -21,6 +21,7 @@ export class UsersService {
   ) {}
 
   //Checks if email is unique
+  private salt = 10;
   async isExistingEmail(email: string) {
     const existingUser = await this.userRepository.findOne({
       where: {
@@ -63,9 +64,8 @@ export class UsersService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    const salt = 10;
     const { password } = createUserDto;
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, this.salt);
     createUserDto.password = hashedPassword;
     const user = this.userRepository.create(createUserDto);
     await this.isExistingEmail(user.email);
@@ -73,8 +73,18 @@ export class UsersService {
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const { password, newPassword, ...updateUserData } = updateUserDto;
     const user = await this.findOne(id);
-    return this.userRepository.save({ ...user, ...updateUserDto });
+    let hashedNewPassword: string;
+    if (password && newPassword) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        throw new BadRequestException('Incorrect Password');
+      }
+      hashedNewPassword = await bcrypt.hash(newPassword, this.salt);
+      user.password = hashedNewPassword;
+    }
+    return this.userRepository.save({ ...user, ...updateUserData });
   }
 
   async removeUser(id: number) {
