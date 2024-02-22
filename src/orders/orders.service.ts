@@ -89,8 +89,7 @@ export class OrdersService {
     const orders = await this.ordersRepository
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.orderItems', 'orderItems')
-      .leftJoin('order.user', 'user')
-      .addSelect(['user.id', 'user.email'])
+      .leftJoinAndSelect('order.user', 'user')
       .getMany();
     return orders;
   }

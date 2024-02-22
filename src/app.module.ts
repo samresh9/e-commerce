@@ -1,45 +1,23 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/entity/user.entity';
 import { ProductsModule } from './products/products.module';
-import { Product } from './products/entity/product.entity';
 import { CategoriesModule } from './categories/categories.module';
-import { Category } from './categories/entity/category.entity';
-import { ProductImage } from './products/entity/product-image.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { AuthModule } from './auth/auth.module';
-import { UserToken } from './users/entity/user-token.entity';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { CartModule } from './cart/cart.module';
-import { Cart } from './cart/entity/cart.entity';
 import { OrdersModule } from './orders/orders.module';
-import { Order } from './orders/entity/order.entity';
-import { OrderItem } from './orders/entity/order-item.entity';
+import { ConfigModule } from '@nestjs/config';
+import { typeOrmConfigAsync } from './database/typeOrm.config';
+import { UserAddressModule } from './user_addresses/user_addresses.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: 'e-com',
-      entities: [
-        User,
-        Product,
-        Category,
-        ProductImage,
-        UserToken,
-        Cart,
-        Order,
-        OrderItem,
-      ],
-      synchronize: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     AuthModule,
     UsersModule,
     ProductsModule,
@@ -47,6 +25,7 @@ import { OrderItem } from './orders/entity/order-item.entity';
     CloudinaryModule,
     CartModule,
     OrdersModule,
+    UserAddressModule,
   ],
   providers: [
     {
@@ -56,6 +35,10 @@ import { OrderItem } from './orders/entity/order-item.entity';
     {
       provide: APP_GUARD, //global auth
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor, //global serializer
     },
   ],
 })
