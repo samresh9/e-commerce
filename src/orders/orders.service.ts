@@ -27,6 +27,7 @@ export class OrdersService {
 
   async create(createOrderDto: CreateOrderDto, userId: number) {
     const user = await this.productsService.findOne(userId);
+    await this.validateCart(userId, createOrderDto);
     const orderItems = await Promise.all(
       createOrderDto.products.map(async ({ productId, quantity }) => {
         const product = await this.productsService.findOne(productId);
@@ -70,6 +71,22 @@ export class OrdersService {
     return order;
   }
 
+  async validateCart(userId: number, createOrderDto: CreateOrderDto) {
+    const cartItems = await this.cartService.getCartByUserId(userId);
+    createOrderDto.products.forEach(({ productId, quantity }) => {
+      const cartItem = cartItems.find((item) => item.product.id === productId);
+      if (!cartItem) {
+        throw new BadRequestException(
+          `Product with ID ${productId} not found in the cart`,
+        );
+      }
+      if (quantity !== cartItem.quantity) {
+        throw new BadRequestException(
+          `Requested quantity for product ID ${productId} exceeds available quantity in the cart`,
+        );
+      }
+    });
+  }
   async findOne(id: number) {
     const order = await this.ordersRepository
       .createQueryBuilder('order')

@@ -5,7 +5,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({ name: 'carts' })
 export class Cart {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   quantity: number;

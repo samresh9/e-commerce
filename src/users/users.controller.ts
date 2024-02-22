@@ -43,7 +43,7 @@ export class UsersController {
       data: await this.userService.createUser(createUserDto),
     };
   }
-  @Get(':id')
+  @Get('user/:id')
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') id: string) {
@@ -54,8 +54,8 @@ export class UsersController {
     };
   }
 
-  @Get('mail')
   @Public()
+  @Get('mail')
   async sendMail() {
     return await this.userService.sendMail();
   }
