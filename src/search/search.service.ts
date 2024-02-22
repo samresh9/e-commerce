@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { CategoriesService } from 'src/categories/categories.service';
+import { EsQuery } from './esQuery';
 
 @Injectable()
 export class SearchService {
@@ -46,21 +47,68 @@ export class SearchService {
     offset: number,
     limit: number,
     text: string,
-    minPrice: number,
-    maxPrice: number,
+    minPrice?: number,
+    maxPrice?: number,
+    orderBy?: string,
   ) {
-    const res = await this.esService.search({
+    // const query = {
+    //   bool: {
+    //     must: {
+    //       multi_match: {
+    //         query: text,
+    //         field: ['name', 'description'],
+    //       },
+    //     },
+    //   },
+    // };
+    // if (minPrice !== undefined && maxPrice !== undefined) {
+    //   query.bool.filter ={
+    //     {
+    //       range: {
+    //         price: {
+    //           gte: minPrice,
+    //           lte: maxPrice,
+    //         },
+    //       },
+
+    //   }
+    // }
+
+    const esQuery: EsQuery = {
       index: 'products',
       from: offset,
       size: limit,
       body: {
         query: {
-          match: {
-            name: text,
+          bool: {
+            must: {
+              multi_match: {
+                query: text,
+                fields: ['name', 'description'],
+              },
+            },
+            filter: {
+              range: {
+                price: {
+                  gte: minPrice, // if min and max price are undefined then elastic search will igonre them in filter and wont thorw error
+                  lte: maxPrice,
+                },
+              },
+            },
           },
         },
       },
-    });
+    };
+
+    if (orderBy) {
+      esQuery.body.sort = {
+        price: {
+          order: orderBy,
+        },
+      };
+    }
+
+    const res = await this.esService.search(esQuery);
     const count = (res.hits.total as SearchTotalHits)?.value;
     const hits = res.hits.hits;
     const results = hits.map((item) => item._source);
@@ -89,12 +137,42 @@ export class SearchService {
       index: 'products',
       body: {
         query: {
-          match: {
+          term: {
             id: id,
           },
         },
         script: {
           source: combinedScript,
+        },
+      },
+    });
+  }
+
+  async remove(id: number) {
+    await this.esService.deleteByQuery({
+      index: 'products',
+      body: {
+        query: {
+          term: {
+            id: id,
+          },
+        },
+      },
+    });
+  }
+
+  async stockUpdate(newStock: number, productId: number) {
+    await this.esService.updateByQuery({
+      index: 'products',
+      body: {
+        query: {
+          term: {
+            id: productId,
+          },
+        },
+        script: {
+          source: 'ctx._source.quantity = params.newStock;',
+          params: { newStock },
         },
       },
     });

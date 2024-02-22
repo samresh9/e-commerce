@@ -26,7 +26,7 @@ export class OrdersService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto, userId: number) {
-    const user = await this.productsService.findOne(userId);
+    const user = await this.usersService.findOne(userId);
     const orderItems = await Promise.all(
       createOrderDto.products.map(async ({ productId, quantity }) => {
         const product = await this.productsService.findOne(productId);

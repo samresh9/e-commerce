@@ -12,8 +12,6 @@ import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductImage } from './entity/product-image.entity';
 import { OrderItem } from 'src/orders/entity/order-item.entity';
 import { SearchService } from 'src/search/search.service';
-import { max } from 'class-validator';
-
 @Injectable()
 export class ProductsService {
   constructor(
@@ -135,7 +133,9 @@ export class ProductsService {
   //delete the product
   async removeProduct(id: number) {
     const product = await this.findOne(id);
-    return this.productRepository.remove(product);
+    const removed = await this.productRepository.remove(product);
+    await this.searchService.remove(id);
+    return removed;
   }
 
   //find images of the product
@@ -154,21 +154,26 @@ export class ProductsService {
     for (const order of orders) {
       const { quantity, product } = order;
       const prod = await this.findOne(product.id);
-      if (cancelled) {
-        prod.stock += quantity;
-      } else {
-        prod.stock -= quantity;
-      }
+      // if (cancelled) {
+      //   prod.stock += quantity;
+      // } else {
+      //   prod.stock -= quantity;
+      // }
+      const newStock = cancelled
+        ? (prod.stock += quantity)
+        : (prod.stock -= quantity);
       await this.productRepository.save(prod);
+      await this.searchService.stockUpdate(newStock, prod.id);
     }
   }
 
   async search(
     page: number,
     pageSize: number,
-    text?: string,
+    text: string,
     minPrice?: number,
     maxPrice?: number,
+    sort?: string,
   ) {
     const skip = (page - 1) * pageSize; //offset , it skips
     const { count, results } = await this.searchService.searchProducts(
@@ -177,6 +182,7 @@ export class ProductsService {
       text,
       minPrice,
       maxPrice,
+      sort,
     );
 
     if (count === 0) {
