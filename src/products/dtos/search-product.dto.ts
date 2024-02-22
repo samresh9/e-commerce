@@ -1,31 +1,39 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
-  Max,
   Min,
 } from 'class-validator';
 
+enum Sort {
+  ASEC = 'asc',
+  DESC = 'desc',
+}
 export class SearchProductDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsInt()
   @Min(1)
   @Transform(({ value }) => Number(value))
   @IsOptional()
   minPrice?: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsInt()
   @IsOptional()
-  @Min(1, { message: 'Page Size should not be less than 1 or Empty' })
   @Transform(({ value }) => Number(value))
   maxPrice?: number;
 
+  @ApiProperty({ enum: Sort, required: false })
+  @IsEnum(Sort)
+  @IsOptional()
+  sort?: Sort;
+
   @ApiProperty()
   @IsString()
-  @IsOptional()
-  search?: string;
+  @IsNotEmpty()
+  search: string;
 }

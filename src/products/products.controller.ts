@@ -21,7 +21,6 @@ import {
   ApiOperation,
   ApiBody,
   ApiBearerAuth,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
@@ -65,13 +64,12 @@ export class ProductsController {
   @Get()
   @Public()
   @ApiOperation({ summary: 'Get ALl products with pagination' })
-  @ApiQuery({ name: 'search', required: false, type: String })
   async getAllProduct(
     @Query() paginationDto: PaginationDto,
     @Query() searchProductDto: SearchProductDto,
   ) {
     const { page, pageSize } = paginationDto;
-    const { minPrice, maxPrice, search } = searchProductDto;
+    const { minPrice, maxPrice, search, sort } = searchProductDto;
     if (search || minPrice || maxPrice) {
       const res = await this.productService.search(
         page,
@@ -79,6 +77,7 @@ export class ProductsController {
         search,
         minPrice,
         maxPrice,
+        sort,
       );
       return {
         statusCode: HttpStatus.CREATED,
