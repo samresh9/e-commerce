@@ -13,6 +13,7 @@ import { OrdersModule } from './orders/orders.module';
 import { ConfigModule } from '@nestjs/config';
 import { typeOrmConfigAsync } from './database/typeOrm.config';
 import { UserAddressModule } from './user_addresses/user_addresses.module';
+import { MailerServiceModule } from './mailer-service/mailer-service.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UserAddressModule } from './user_addresses/user_addresses.module';
     CartModule,
     OrdersModule,
     UserAddressModule,
+    MailerServiceModule,
   ],
   providers: [
     {

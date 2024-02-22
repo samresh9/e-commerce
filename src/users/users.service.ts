@@ -11,6 +11,7 @@ import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dtos/update-user-dto';
 import { UserToken } from './entity/user-token.entity';
+import { MailerServiceService } from 'src/mailer-service/mailer-service.service';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +19,7 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(UserToken)
     private usersTokenRepository: Repository<UserToken>,
+    private readonly mailService: MailerServiceService,
   ) {}
 
   //Checks if email is unique
@@ -125,5 +127,9 @@ export class UsersService {
     if (!tokenId) throw new UnauthorizedException('no');
     if (tokenId === tokenIdFromDb) return true;
     return false;
+  }
+
+  async sendMail() {
+    return this.mailService.sendMail();
   }
 }
