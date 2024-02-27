@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -27,21 +29,33 @@ export class UserAddressesController {
     @Body() createUserAddressesDto: CreateUserAddressesDto,
     @User() userId: number,
   ) {
-    return await this.userAddressesService.create(
-      createUserAddressesDto,
-      userId,
-    );
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Address Created',
+      data: await this.userAddressesService.create(
+        createUserAddressesDto,
+        userId,
+      ),
+    };
   }
 
   @Get()
   async findByUser(@User() userId: number) {
-    return await this.userAddressesService.findAddressesByUserId(userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      data: await this.userAddressesService.findAddressesByUserId(userId),
+    };
   }
 
   @Get('all')
-  @Roles([Role.Admin, Role.Customer])
+  @Roles([Role.Admin])
   async findAll() {
-    return await this.userAddressesService.findAll();
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      data: await this.userAddressesService.findAll(),
+    };
   }
 
   @Put(':id')
@@ -50,10 +64,22 @@ export class UserAddressesController {
     @User() userId: number,
     @Body() updateUserAddressDto: UpdateUserAddressesDto,
   ) {
-    return await this.userAddressesService.update(
-      updateUserAddressDto,
-      id,
-      userId,
-    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Address Updated',
+      data: await this.userAddressesService.update(
+        updateUserAddressDto,
+        id,
+        userId,
+      ),
+    };
+  }
+  @Delete(':id')
+  async delete(@Param('id', ParseIntPipe) id: number, @User() userId: number) {
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Address Delted',
+      data: await this.userAddressesService.delete(id, userId),
+    };
   }
 }
