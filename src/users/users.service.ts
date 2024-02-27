@@ -129,7 +129,7 @@ export class UsersService {
     return false;
   }
 
-  async sendMail() {
-    return this.mailService.sendMail();
-  }
+  // async sendMail() {
+  //   return this.mailService.sendMail();
+  // }
 }

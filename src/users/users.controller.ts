@@ -16,11 +16,15 @@ import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
 import { User } from 'src/decorators/current-user.decorator';
+import { PasswordResetService } from './users.password-reset.service';
 @Controller('users')
 @ApiBearerAuth()
 @ApiTags('User')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly passwordResetService: PasswordResetService,
+  ) {}
 
   @Get()
   @Roles([Role.Admin])
@@ -54,11 +58,11 @@ export class UsersController {
     };
   }
 
-  @Public()
-  @Get('mail')
-  async sendMail() {
-    return await this.userService.sendMail();
-  }
+  // @Public()
+  // @Get('mail')
+  // async sendMail() {
+  //   return await this.userService.sendMail();
+  // }
 
   @Put()
   @Roles([Role.Customer, Role.Admin])
@@ -84,5 +88,10 @@ export class UsersController {
       message: 'User Deleted',
       data: await this.userService.removeUser(parseInt(id)),
     };
+  }
+
+  @Post('/forgotPassword')
+  async requestResetPassword(@Body() body: any) {
+    return await this.passwordResetService.requestPasswordReset(body);
   }
 }
