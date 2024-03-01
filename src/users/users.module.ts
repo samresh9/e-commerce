@@ -7,11 +7,11 @@ import { UserToken } from './entity/user-token.entity';
 import { Cart } from 'src/cart/entity/cart.entity';
 import { MailerServiceModule } from 'src/mailer-service/mailer-service.module';
 import { PasswordResetService } from './users.password-reset.service';
+import { PasswordResetToken } from './entity/password-reset.entity';
 
 @Module({
-  // imports:[UserRepository]
   imports: [
-    TypeOrmModule.forFeature([User, UserToken, Cart]),
+    TypeOrmModule.forFeature([User, UserToken, Cart, PasswordResetToken]),
     MailerServiceModule,
   ], // This import makes User entity and its repository available in this module.
   controllers: [UsersController],

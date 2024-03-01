@@ -6,6 +6,7 @@ export class MailerServiceService {
   constructor(private readonly mailerService: MailerService) {}
 
   async sendMail(mail: string, token: string) {
+    console.log(mail);
     await this.mailerService.sendMail({
       to: mail, // list of receivers
       from: 'thapasamresh9@gmail.com', // sender address

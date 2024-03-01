@@ -17,6 +17,8 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
 import { User } from 'src/decorators/current-user.decorator';
 import { PasswordResetService } from './users.password-reset.service';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ForgotPasswordDto } from './dtos/forgor-password.dto';
 @Controller('users')
 @ApiBearerAuth()
 @ApiTags('User')
@@ -91,7 +93,26 @@ export class UsersController {
   }
 
   @Post('/forgotPassword')
-  async requestResetPassword(@Body() body: any) {
-    return await this.passwordResetService.requestPasswordReset(body);
+  @Public()
+  async requestResetPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    const message =
+      await this.passwordResetService.requestPasswordReset(forgotPasswordDto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: message,
+      data: '',
+    };
+  }
+
+  @Post('/resetPassword')
+  @Public()
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    const message =
+      await this.passwordResetService.resetPassword(resetPasswordDto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: message,
+      data: '',
+    };
   }
 }

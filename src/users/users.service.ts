@@ -54,6 +54,9 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
     const user = await this.userRepository.findOne({
       where: {
         email,
