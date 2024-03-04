@@ -60,12 +60,6 @@ export class UsersController {
     };
   }
 
-  // @Public()
-  // @Get('mail')
-  // async sendMail() {
-  //   return await this.userService.sendMail();
-  // }
-
   @Put()
   @Roles([Role.Customer, Role.Admin])
   @ApiOperation({ summary: 'Update User Information' })

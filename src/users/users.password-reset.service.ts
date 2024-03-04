@@ -29,8 +29,8 @@ export class PasswordResetService {
     private readonly emailService: MailerServiceService,
   ) {}
 
-  async requestPasswordReset(body: ForgotPasswordDto) {
-    const { email } = body;
+  async requestPasswordReset(forgotPasswordDto: ForgotPasswordDto) {
+    const { email } = forgotPasswordDto;
     const user = await this.userService.findOneByEmail(email);
     if (user) {
       const isToken = await this.checkToken(email);
@@ -50,8 +50,8 @@ export class PasswordResetService {
     }
   }
 
-  async resetPassword(body: ResetPasswordDto) {
-    const { token, newPassword } = body;
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { token, newPassword } = resetPasswordDto;
     const tokenRecord = await this.findToken(token);
     if (
       tokenRecord &&
@@ -68,6 +68,7 @@ export class PasswordResetService {
     }
     throw new BadRequestException('Token invalid or Not Found');
   }
+
   generateToken() {
     const token = uuid.v4();
     return token;

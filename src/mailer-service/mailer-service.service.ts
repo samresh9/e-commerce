@@ -6,11 +6,10 @@ export class MailerServiceService {
   constructor(private readonly mailerService: MailerService) {}
 
   async sendMail(mail: string, token: string) {
-    console.log(mail);
     await this.mailerService.sendMail({
       to: mail, // list of receivers
       from: 'thapasamresh9@gmail.com', // sender address
-      subject: 'Testing Nest MailerModule ✔', // Subject line
+      subject: 'Password Reset', // Subject line
       text: 'Password Reset', // plaintext body
       html: `
     <p>You have requested to reset your password. Please click the link below to reset your password:</p>
