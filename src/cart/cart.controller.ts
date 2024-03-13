@@ -75,7 +75,7 @@ export class CartController {
     };
   }
 
-  @Get('user')
+  @Get('user/cart')
   @Roles([Role.Customer])
   @ApiOperation({ summary: 'Get All Carts By User' })
   async getCartByUser(@User() userId: number) {

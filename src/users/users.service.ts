@@ -11,6 +11,7 @@ import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dtos/update-user-dto';
 import { UserToken } from './entity/user-token.entity';
+import { MailerServiceService } from 'src/mailer-service/mailer-service.service';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +19,11 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(UserToken)
     private usersTokenRepository: Repository<UserToken>,
+    private readonly mailService: MailerServiceService,
   ) {}
 
   //Checks if email is unique
+  private salt = 10;
   async isExistingEmail(email: string) {
     const existingUser = await this.userRepository.findOne({
       where: {
@@ -51,6 +54,9 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
     const user = await this.userRepository.findOne({
       where: {
         email,
@@ -63,9 +69,8 @@ export class UsersService {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    const salt = 10;
     const { password } = createUserDto;
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, this.salt);
     createUserDto.password = hashedPassword;
     const user = this.userRepository.create(createUserDto);
     await this.isExistingEmail(user.email);
@@ -73,8 +78,18 @@ export class UsersService {
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    const { password, newPassword, ...updateUserData } = updateUserDto;
     const user = await this.findOne(id);
-    return this.userRepository.save({ ...user, ...updateUserDto });
+    let hashedNewPassword: string;
+    if (password && newPassword) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        throw new BadRequestException('Incorrect Password');
+      }
+      hashedNewPassword = await bcrypt.hash(newPassword, this.salt);
+      user.password = hashedNewPassword;
+    }
+    return this.userRepository.save({ ...user, ...updateUserData });
   }
 
   async removeUser(id: number) {
@@ -116,4 +131,8 @@ export class UsersService {
     if (tokenId === tokenIdFromDb) return true;
     return false;
   }
+
+  // async sendMail() {
+  //   return this.mailService.sendMail();
+  // }
 }

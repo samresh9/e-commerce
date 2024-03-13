@@ -15,11 +15,18 @@ import { UpdateUserDto } from './dtos/update-user-dto';
 import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
+import { User } from 'src/decorators/current-user.decorator';
+import { PasswordResetService } from './users.password-reset.service';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ForgotPasswordDto } from './dtos/forgor-password.dto';
 @Controller('users')
 @ApiBearerAuth()
 @ApiTags('User')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly passwordResetService: PasswordResetService,
+  ) {}
 
   @Get()
   @Roles([Role.Admin])
@@ -42,7 +49,7 @@ export class UsersController {
       data: await this.userService.createUser(createUserDto),
     };
   }
-  @Get(':id')
+  @Get('user/:id')
   @Roles([Role.Admin])
   @ApiOperation({ summary: 'Get User by id' })
   async getUserById(@Param('id') id: string) {
@@ -53,17 +60,17 @@ export class UsersController {
     };
   }
 
-  @Put(':id')
-  @Roles([Role.Admin])
+  @Put()
+  @Roles([Role.Customer, Role.Admin])
   @ApiOperation({ summary: 'Update User Information' })
   async updateUser(
-    @Param('id') id: string,
+    @User() userId: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'User Updated',
-      data: await this.userService.updateUser(parseInt(id), updateUserDto),
+      data: await this.userService.updateUser(userId, updateUserDto),
     };
   }
 
@@ -76,6 +83,30 @@ export class UsersController {
       statusCode: HttpStatus.OK,
       message: 'User Deleted',
       data: await this.userService.removeUser(parseInt(id)),
+    };
+  }
+
+  @Post('/forgotPassword')
+  @Public()
+  async requestResetPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    const message =
+      await this.passwordResetService.requestPasswordReset(forgotPasswordDto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: message,
+      data: '',
+    };
+  }
+
+  @Post('/resetPassword')
+  @Public()
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    const message =
+      await this.passwordResetService.resetPassword(resetPasswordDto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: message,
+      data: '',
     };
   }
 }

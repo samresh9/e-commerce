@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { PasswordResetToken } from './password-reset.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -53,4 +54,10 @@ export class User {
 
   @OneToMany(() => UserAddress, (userAddress) => userAddress.user)
   userAddresses: UserAddress[];
+
+  @OneToMany(
+    () => PasswordResetToken,
+    (passwordResetToken) => passwordResetToken.user,
+  )
+  resetTokens: PasswordResetToken[];
 }
