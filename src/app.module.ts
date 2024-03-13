@@ -15,6 +15,7 @@ import { typeOrmConfigAsync } from './database/typeOrm.config';
 import { UserAddressModule } from './user_addresses/user_addresses.module';
 import { MailerServiceModule } from './mailer-service/mailer-service.module';
 import { SearchModule } from './search/search.module';
+import { HttpExceptionFilter } from './common/http.exception.filter';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SearchModule } from './search/search.module';
     SearchModule,
   ],
   providers: [
+    HttpExceptionFilter,
     Logger,
     {
       provide: APP_GUARD, //global auth

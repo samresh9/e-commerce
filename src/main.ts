@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { logger } from './logger/winston.logger';
 import { WinstonModule } from 'nest-winston';
+import { HttpExceptionFilter } from './common/http.exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -21,6 +22,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true })); //setting whitelist true filters the unwanted body properties
+  const httpExceptionFilter = app.get<HttpExceptionFilter>(HttpExceptionFilter);
+  app.useGlobalFilters(httpExceptionFilter);
+
   // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   await app.listen(PORT);
 }
