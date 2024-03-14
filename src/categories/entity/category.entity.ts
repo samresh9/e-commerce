@@ -9,7 +9,7 @@ import {
 import { Product } from 'src/products/entity/product.entity';
 import { Exclude } from 'class-transformer';
 
-@Entity()
+@Entity({ name: 'categories' })
 export class Category {
   @PrimaryGeneratedColumn()
   id: number;

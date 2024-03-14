@@ -15,8 +15,8 @@ async function bootstrap() {
   const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
   const config = new DocumentBuilder()
-    .setTitle('User')
-    .setDescription('The ')
+    .setTitle('E-Commerce API')
+    .setDescription('The APIs for a ecommerce app ')
     .addBearerAuth() //adds bearer auth
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -27,7 +27,9 @@ async function bootstrap() {
 
   // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   await app.listen(PORT);
+  logger.info(`Server is running at http://localhost:${PORT}/`);
+  logger.info(`For API documentation: http://localhost:${PORT}/api/docs`);
 }
-bootstrap().then(() => {
-  logger.info(`Server Started at localhost:3000`);
+bootstrap().catch((error) => {
+  logger.error('Error:', error || error.message);
 });
