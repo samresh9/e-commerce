@@ -24,6 +24,7 @@ export class CreateProductDto {
   @Transform(({ value }) => {
     return Number(value);
   })
+  @Min(1)
   price: number;
 
   @ApiProperty()
@@ -32,7 +33,7 @@ export class CreateProductDto {
   @Transform(({ value }) => {
     return Number(value);
   })
-  @Min(0)
+  @Min(1)
   stock: number;
 
   @ApiProperty()

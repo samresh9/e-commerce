@@ -11,7 +11,6 @@ import {
   UploadedFiles,
   ParseIntPipe,
   Query,
-  HttpException,
   Logger,
   Inject,
   LoggerService,
@@ -88,7 +87,8 @@ export class ProductsController {
         statusCode: HttpStatus.CREATED,
         message: 'Success',
         data: {
-          res,
+          count: res.count,
+          products: res.products,
         },
       };
     }
@@ -137,13 +137,6 @@ export class ProductsController {
       message: 'Product Updated',
       data: await this.productService.update(updateProductDto, parseInt(id)),
     };
-  }
-
-  @Public()
-  @Get('test/test')
-  async test() {
-    // return await this.productService.findAll(1, 2);
-    throw new HttpException('err', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @Delete(':id')

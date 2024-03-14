@@ -84,7 +84,13 @@ export class SearchService {
             must: {
               multi_match: {
                 query: text,
-                fields: ['name', 'description'],
+                fields: [
+                  'name',
+                  'description',
+                  'category.name',
+                  'category.description',
+                ],
+                fuzziness: 'AUTO',
               },
             },
             filter: {
