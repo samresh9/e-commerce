@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from 'src/products/entity/product.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Category {
@@ -23,8 +24,10 @@ export class Category {
   products: Product[];
 
   @CreateDateColumn({ type: 'timestamp' })
+  @Exclude()
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
+  @Exclude()
   updatedAt: Date;
 }

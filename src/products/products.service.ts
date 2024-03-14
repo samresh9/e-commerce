@@ -11,7 +11,7 @@ import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { ProductImage } from './entity/product-image.entity';
 import { OrderItem } from 'src/orders/entity/order-item.entity';
-
+import { SearchService } from 'src/search/search.service';
 @Injectable()
 export class ProductsService {
   constructor(
@@ -20,10 +20,12 @@ export class ProductsService {
     private productImageRepository: Repository<ProductImage>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    private readonly searchService: SearchService,
   ) {}
 
   //creates new product
   async create(createProductDto: CreateProductDto) {
+    // await this.searchService.createIndex();
     const category = await this.categoryRepository.findOne({
       where: { id: createProductDto.categoryId },
     });
@@ -46,7 +48,10 @@ export class ProductsService {
       product.productImages = productImages;
     }
 
-    return this.productRepository.save(product);
+    const savedProduct = await this.productRepository.save(product);
+    //Indexed to ElasticSearch
+    await this.searchService.indexProduct(savedProduct);
+    return savedProduct;
   }
 
   //finds one product by its id
@@ -68,9 +73,10 @@ export class ProductsService {
   }
 
   //finds all product with category detail and images
-  async findAll(page: number, pageSize: number) {
+  async findAll(page: number, pageSize: number): Promise<[Product[], number]> {
     const skip = (page - 1) * pageSize; //offset , it skips
-    const [users, totalCount] = await this.productRepository.findAndCount({
+
+    const [products, totalCount] = await this.productRepository.findAndCount({
       order: {
         id: 'ASC',
       },
@@ -85,7 +91,7 @@ export class ProductsService {
       );
     }
 
-    return [users, totalCount];
+    return [products, totalCount];
   }
 
   //update the product details
@@ -94,33 +100,42 @@ export class ProductsService {
       where: { id: id },
       relations: ['productImages'],
     });
+    const { categoryId, images, ...updateProductData } = updateProductDto;
+    const elasticUpdate: any = updateProductData;
 
     if (!product) throw new NotFoundException('Product Not Found');
-    if (updateProductDto.categoryId) {
+    if (categoryId) {
       const category = await this.categoryRepository.findOneBy({
         id: updateProductDto.categoryId,
       });
 
       if (!category) throw new NotFoundException('Category Not Found');
-
+      elasticUpdate.category = { ...category };
       product.category = category;
     }
     //Update images
-    if (updateProductDto.images) {
-      const productImgs = updateProductDto.images.map((url) =>
+    if (images) {
+      const productImgs = images.map((url) =>
         this.productImageRepository.create({ url }),
       );
       const newProductImages =
         await this.productImageRepository.save(productImgs);
       product.productImages = [...product.productImages, ...newProductImages];
     }
-    return this.productRepository.save({ ...product, ...updateProductDto });
+    const savedProduct = this.productRepository.save({
+      ...product,
+      ...updateProductData,
+    });
+    await this.searchService.updateProduct(elasticUpdate, id);
+    return savedProduct;
   }
 
   //delete the product
   async removeProduct(id: number) {
     const product = await this.findOne(id);
-    return this.productRepository.remove(product);
+    const removed = await this.productRepository.remove(product);
+    await this.searchService.remove(id);
+    return removed;
   }
 
   //find images of the product
@@ -139,12 +154,51 @@ export class ProductsService {
     for (const order of orders) {
       const { quantity, product } = order;
       const prod = await this.findOne(product.id);
-      if (cancelled) {
-        prod.stock += quantity;
-      } else {
-        prod.stock -= quantity;
-      }
+      // if (cancelled) {
+      //   prod.stock += quantity;
+      // } else {
+      //   prod.stock -= quantity;
+      // }
+      const newStock = cancelled
+        ? (prod.stock += quantity)
+        : (prod.stock -= quantity);
       await this.productRepository.save(prod);
+      await this.searchService.stockUpdate(newStock, prod.id);
     }
+  }
+
+  async search(
+    page: number,
+    pageSize: number,
+    text: string,
+    minPrice?: number,
+    maxPrice?: number,
+    sort?: string,
+  ) {
+    const skip = (page - 1) * pageSize; //offset , it skips
+    const { count, results } = await this.searchService.searchProducts(
+      skip,
+      pageSize,
+      text,
+      minPrice,
+      maxPrice,
+      sort,
+    );
+
+    if (count === 0) {
+      // Handle the case when no results are found
+      return {
+        count: 0,
+        results: [],
+      };
+    }
+    const totalCount = count;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    if (page > totalPages) {
+      throw new BadRequestException(
+        `Invalid page number, should be less than or eqauls to ${totalPages}`,
+      );
+    }
+    return { count, results };
   }
 }
