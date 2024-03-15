@@ -150,6 +150,20 @@ export class ProductsService {
     return images;
   }
 
+  async findMany(ids: number[]) {
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.productImages', 'productImages')
+      .leftJoinAndSelect('product.category', 'category')
+      .where('product.id IN (:...ids)', { ids })
+      .getMany();
+
+    if (!products) {
+      throw new NotFoundException('Product Not Found');
+    }
+    return products;
+  }
+
   async stockUpdate(orders: OrderItem[], cancelled?: boolean) {
     for (const order of orders) {
       const { quantity, product } = order;
@@ -189,7 +203,7 @@ export class ProductsService {
       // Handle the case when no results are found
       return {
         count: 0,
-        results: [],
+        products: [],
       };
     }
     const totalCount = count;
@@ -199,6 +213,8 @@ export class ProductsService {
         `Invalid page number, should be less than or eqauls to ${totalPages}`,
       );
     }
-    return { count, results };
+    const ids = results.map((result: any) => result.id);
+    const products = await this.findMany(ids);
+    return { count, products };
   }
 }

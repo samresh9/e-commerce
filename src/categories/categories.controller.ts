@@ -12,7 +12,7 @@ import {
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
@@ -25,6 +25,9 @@ export class CategoriesController {
 
   @Post()
   @Roles([Role.Admin])
+  @ApiBody({
+    type: CreateCategoryDto,
+  })
   @ApiOperation({ summary: 'Create  A new Category' })
   async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return {

@@ -8,20 +8,26 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dtos/sigin-in.dto';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import * as uuid from 'uuid';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/role.enum';
 import { Public } from 'src/decorators/public.decorator';
 
-@ApiTags('Authentication')
+@ApiTags('Sign-In')
 @Controller('auth')
 @ApiBearerAuth()
 export class AuthController {
   constructor(private authservice: AuthService) {}
 
   @Post('signin')
+  @ApiOperation({ summary: 'Sign In' })
   @Public()
   @HttpCode(HttpStatus.OK) // status code in response object
   @ApiResponse({
@@ -51,6 +57,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @ApiOperation({ summary: 'Refresh the expired token' })
   @Public()
   async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authservice.refreshAccessToken(refreshTokenDto);

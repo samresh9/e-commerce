@@ -9,6 +9,7 @@ export interface EsQuery {
           multi_match: {
             query: string;
             fields: string[];
+            fuzziness: string;
           };
         };
         filter: {

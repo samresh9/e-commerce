@@ -11,6 +11,9 @@ import {
   UploadedFiles,
   ParseIntPipe,
   Query,
+  Logger,
+  Inject,
+  LoggerService,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dtos/create-product.dto';
@@ -38,6 +41,7 @@ export class ProductsController {
   constructor(
     private readonly productService: ProductsService,
     private readonly cloudinaryService: CloudinaryService,
+    @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
   @Post()
@@ -83,7 +87,8 @@ export class ProductsController {
         statusCode: HttpStatus.CREATED,
         message: 'Success',
         data: {
-          res,
+          count: res.count,
+          products: res.products,
         },
       };
     }
@@ -92,7 +97,7 @@ export class ProductsController {
       pageSize,
     );
     return {
-      statusCode: HttpStatus.CREATED,
+      statusCode: HttpStatus.OK,
       message: 'Success',
       data: {
         products,
